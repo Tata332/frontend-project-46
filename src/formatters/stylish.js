@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import genDiff from '../gendiff.js';
+import genDiff from '../getUniqueKeys.js';
 
 function isObject(value) {
   return (

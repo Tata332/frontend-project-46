@@ -1,4 +1,4 @@
-import genDiff from '../gendiff.js';
+import genDiff from '../getUniqueKeys';
 
 function isObject(value) {
   return (
