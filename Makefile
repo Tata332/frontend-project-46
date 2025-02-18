@@ -1,8 +1,18 @@
+JEST=NODE_OPTIONS=--experimental-vm-modules npx jest
+
 install:
 	npm ci
 
-gendiff:
-	node bin/gendiff.js -h
+publish:
+	npm publish --dry-run
 
-gendiff:
-	node ./bin/gendiff.js file1.json file2.json
+test:
+	$(JEST)
+
+coverage:
+	$(JEST) --coverage
+
+lint:
+	npx eslint .
+
+.PHONY: install publish coverage lint
