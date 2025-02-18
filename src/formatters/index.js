@@ -1,7 +1,7 @@
 import stylish from './stylish.js';
 import plain from './plain.js';
 import json from './json.js';
-import retriveObjectFromFile from '../parser.js';
+import retriveObjectFromFile from '../parsers.js';
 
 const genDiffFilesRaw = (filepath1, filepath2, method) => {
   const obj1 = retriveObjectFromFile(filepath1);
