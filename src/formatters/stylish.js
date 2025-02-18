@@ -35,7 +35,7 @@ const stylish = (o1, o2) => {
     const repr = node.map((el) => {
       switch (el.type) {
         case 'removed':
-          return `${' '.repeat(numOfSpaces)}- ${el.key}: ${stylishValue(el.value, level + 2)}`; // + 2 for one level deeper and for "- "
+          return `${' '.repeat(numOfSpaces)}- ${el.key}: ${stylishValue(el.value, level + 2)}`;
         case 'added':
           return `${' '.repeat(numOfSpaces)}+ ${el.key}: ${stylishValue(el.value, level + 2)}`;
         case 'unchanged':
