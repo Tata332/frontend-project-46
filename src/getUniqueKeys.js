@@ -13,7 +13,7 @@ function isObject(value) {
   );
 }
 
-const genDiff = (o1, o2) => {
+const getUniqueKeys = (o1, o2) => {
   const allKeys = _.sortBy([...new Set([...Object.keys(o1), ...Object.keys(o2)])], (el) => el);
 
   const obj1OnlyKeys = firstObjectOnlyKeys(o1, o2);
@@ -48,7 +48,7 @@ const genDiff = (o1, o2) => {
       return [...diff, {
         type: 'changedLater',
         key,
-        value: genDiff(o1[key], o2[key]),
+        value: getUniqueKeys(o1[key], o2[key]),
       }];
     }
     return [...diff, {
