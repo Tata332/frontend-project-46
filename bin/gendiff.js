@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { program } from 'commander';
+import genDiffFiles from '../src/formatters/index.js';
 
 program.name('gendiff')
   .description('Compares two configuration files and shows a difference.')
