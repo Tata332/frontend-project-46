@@ -1,4 +1,4 @@
-import genDiff from '../getUniqueKeys';
+import getUniqueKeys from '../getUniqueKeys';
 
 function isObject(value) {
   return (
@@ -19,7 +19,7 @@ const plainValue = (val) => {
 };
 
 const plain = (o1, o2) => {
-  const struct = genDiff(o1, o2);
+  const struct = getUniqueKeys(o1, o2);
   const plainTraversal = (node, path = []) => {
     const repr = node.filter((el) => el.type !== 'unchanged')
       .map((el) => {

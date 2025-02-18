@@ -61,4 +61,4 @@ const genDiff = (o1, o2) => {
   return diffOutputArr;
 };
 
-export default genDiff;
+export default getUniqueKeys;
