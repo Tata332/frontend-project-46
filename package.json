@@ -2,17 +2,15 @@
   "name": "@hexlet/code",
   "type": "module",
   "version": "1.0.0",
-  "description": "[![Actions Status](https://github.com/Tata332/frontend-project-46/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Tata332/frontend-project-46/actions)",
+  "description": "Утилита для сравнения конфигурационных файлов",
   "main": "src/formatters/index.js",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
-    "coverage": "NODE_OPTIONS=--experimental-vm-modules npx jest --coverage"
+    "test": "jest --runInBand",
+    "coverage": "jest --coverage",
+    "lint": "eslint ."
   },
-  "keywords": [
-    "node",
-    "json"
-  ],
-  "author": "",
+  "keywords": ["node", "json", "diff", "configuration"],
+  "author": "Tata332",
   "license": "ISC",
   "dependencies": {
     "commander": "^13.1.0",
@@ -32,6 +30,6 @@
     "simple-git-hooks": "^2.11.1"
   },
   "simple-git-hooks": {
-    "pre-commit": "make lint && make test"
+    "pre-commit": "npm run lint && npm run test"
   }
 }
