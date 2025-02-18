@@ -1,4 +1,4 @@
-import getUniqueKeys from '../getUniqueKeys';
+import getUniqueKeys from '/project/code/src/getUniqueKeys';
 
 function isObject(value) {
   return (
