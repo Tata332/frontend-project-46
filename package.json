@@ -9,7 +9,12 @@
     "coverage": "jest --coverage",
     "lint": "eslint ."
   },
-  "keywords": ["node", "json", "diff", "configuration"],
+  "keywords": [
+    "node",
+    "json",
+    "diff",
+    "configuration"
+  ],
   "author": "Tata332",
   "license": "ISC",
   "dependencies": {
