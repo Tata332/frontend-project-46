@@ -1,13 +1,17 @@
 {
-  "name": "frontend-project-46",
+  "name": "@hexlet/code",
   "type": "module",
   "version": "1.0.0",
   "description": "[![Actions Status](https://github.com/Tata332/frontend-project-46/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Tata332/frontend-project-46/actions)",
-  "main": "src/index.js",
+  "main": "src/formatters/index.js",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest  --coverage"
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
+    "coverage": "NODE_OPTIONS=--experimental-vm-modules npx jest --coverage"
   },
-  "keywords": [],
+  "keywords": [
+    "node",
+    "json"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
