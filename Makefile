@@ -1,17 +1,20 @@
 install: 
 	npm ci
+JEST=NODE_OPTIONS=--experimental-vm-modules npx jest
+
+install:
+	npm ci
 
 publish:
 	npm publish --dry-run
 
+test:
+	$(JEST)
+
+coverage:
+	$(JEST) --coverage
+
 lint:
 	npx eslint .
-	
-lint-fix:
-	npx eslint --fix .
 
-test:
-	npx jest 
-
-test-coverage:
-	npx jest --coverage
+.PHONY: install publish coverage lint

@@ -1,18 +1,26 @@
 import stylish from './stylish.js';
 import plain from './plain.js';
 import json from './json.js';
+import retriveObjectFromFile from '../parsers.js';
 
-const doFormat = (formatterName, tree) => {
-  switch (formatterName) {
+const genDiffFilesRaw = (filepath1, filepath2, method) => {
+  const obj1 = retriveObjectFromFile(filepath1);
+  const obj2 = retriveObjectFromFile(filepath2);
+  return method(obj1, obj2);
+};
+
+const genDiffFiles = (filepath1, filepath2, format = 'stylish') => {
+  switch (format) {
     case 'stylish':
-      return stylish(tree, '  ');
+      return genDiffFilesRaw(filepath1, filepath2, stylish);
     case 'plain':
-      return plain(tree, '  ');
+      return genDiffFilesRaw(filepath1, filepath2, plain);
     case 'json':
-      return json(tree, '  ');
+      return genDiffFilesRaw(filepath1, filepath2, json);
     default:
-      throw new Error(`Unknown formatter: "${formatterName}"`);
+      throw new Error(`unknown format: ${format}`);
   }
 };
 
-export default doFormat;
+export { stylish, plain, json };
+export default genDiffFiles;

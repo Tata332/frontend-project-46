@@ -1,38 +1,44 @@
-import _ from 'lodash';
+import genDiff from '../gendiff.js';
 
-const outputValue = (value) => {
-  if (_.isObject(value)) return '[complex value]';
-  if (_.isString(value)) return `'${value}'`;
+function isObject(value) {
+  return (
+    typeof value === 'object'
+    && value !== null
+    && !Array.isArray(value)
+  );
+}
 
-  return value;
+const plainValue = (val) => {
+  if (isObject(val)) {
+    return '[complex value]';
+  }
+  if (typeof val === 'string') {
+    return `'${val}'`;
+  }
+  return `${val}`;
 };
 
-const plain = (tree) => {
-  const iter = (node, path) => {
-    const result = node.flatMap((obj) => {
-      const { key, value, status } = obj;
-      const valuePath = [...path, key].join('.');
-
-      switch (status) {
-        case 'nested':
-          return iter(value, [valuePath]);
-        case 'added':
-          return `Property '${valuePath}' was added with value: ${outputValue(value)}`;
-        case 'removed':
-          return `Property '${valuePath}' was removed`;
-        case 'changed':
-          return `Property '${valuePath}' was updated. From ${outputValue(obj.oldValue)} to ${outputValue(obj.newValue)}`;
-        case 'unchanged':
-          return [];
-        default:
-          throw new Error(`Status "${status}" is unknown`);
-      }
-    });
-
-    return result.join('\n');
+const plain = (o1, o2) => {
+  const struct = genDiff(o1, o2);
+  const plainTraversal = (node, path = []) => {
+    const repr = node.filter((el) => el.type !== 'unchanged')
+      .map((el) => {
+        switch (el.type) {
+          case 'removed':
+            return `Property '${[...path, el.key].join('.')}' was removed`;
+          case 'added':
+            return `Property '${[...path, el.key].join('.')}' was added with value: ${plainValue(el.value)}`;
+          case 'changedLater':
+            return plainTraversal(el.value, [...path, el.key]);
+          case 'updated':
+            return `Property '${[...path, el.key].join('.')}' was updated. From ${plainValue(el.before)} to ${plainValue(el.current)}`;
+          default:
+            throw new Error(`unknown type ${el.type}`);
+        }
+      });
+    return repr.join('\n');
   };
-
-  return iter(tree, []);
+  return plainTraversal(struct);
 };
 
 export default plain;

@@ -1,21 +1,64 @@
 import _ from 'lodash';
 
-const getDiffArr = (obj1, obj2) => {
-  const keys = _.sortBy(_.union(Object.keys(obj1), Object.keys(obj2)));
-
-  const diffArr = keys.map((key) => {
-    if (!_.has(obj1, key)) return { key, value: obj2[key], status: 'added' };
-    if (!_.has(obj2, key)) return { key, value: obj1[key], status: 'removed' };
-    if (_.isObject(obj1[key]) && _.isObject(obj2[key])) return { key, value: getDiffArr(obj1[key], obj2[key]), status: 'nested' };
-    if (obj1[key] !== obj2[key]) {
-      return {
-        key, oldValue: obj1[key], newValue: obj2[key], status: 'changed',
-      };
-    }
-    return { key, value: obj1[key], status: 'unchanged' };
-  });
-
-  return diffArr;
+const firstObjectOnlyKeys = (o1, o2) => {
+  const keys = Object.keys(o1).filter((el) => !Object.keys(o2).includes(el));
+  return new Set(keys);
 };
 
-export default getDiffArr;
+function isObject(value) {
+  return (
+    typeof value === 'object'
+    && value !== null
+    && !Array.isArray(value)
+  );
+}
+
+const genDiff = (o1, o2) => {
+  const allKeys = _.sortBy([...new Set([...Object.keys(o1), ...Object.keys(o2)])], (el) => el);
+
+  const obj1OnlyKeys = firstObjectOnlyKeys(o1, o2);
+  const obj2OnlyKeys = firstObjectOnlyKeys(o2, o1);
+
+  const mutualKeys = Object.keys(o1).filter((el) => Object.keys(o2).includes(el));
+  const sameValueKeys = new Set(mutualKeys.filter((el) => o1[el] === o2[el]));
+
+  const diffOutputArr = allKeys.reduce((diff, key) => {
+    if (obj1OnlyKeys.has(key)) {
+      return [...diff, {
+        type: 'removed',
+        key,
+        value: o1[key],
+      }];
+    }
+    if (obj2OnlyKeys.has(key)) {
+      return [...diff, {
+        type: 'added',
+        key,
+        value: o2[key],
+      }];
+    }
+    if (sameValueKeys.has(key)) {
+      return [...diff, {
+        type: 'unchanged',
+        key,
+        value: o1[key],
+      }];
+    }
+    if (isObject(o1[key]) && isObject(o2[key])) {
+      return [...diff, {
+        type: 'changedLater',
+        key,
+        value: genDiff(o1[key], o2[key]),
+      }];
+    }
+    return [...diff, {
+      type: 'updated',
+      key,
+      before: o1[key],
+      current: o2[key],
+    }];
+  }, []);
+  return diffOutputArr;
+};
+
+export default genDiff;

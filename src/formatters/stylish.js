@@ -1,56 +1,59 @@
 import _ from 'lodash';
+import genDiff from '../gendiff.js';
 
-const stringify = (value, currentDepth, indent) => {
-  const iter = (currentValue, depth) => {
-    if (!_.isObject(currentValue)) return `${currentValue}`;
+function isObject(value) {
+  return (
+    typeof value === 'object'
+    && value !== null
+    && !Array.isArray(value)
+  );
+}
 
-    const currentIndent = (currentDepth === 1)
-      ? indent.repeat(depth + currentDepth)
-      : indent.repeat(depth + 1);
-    const bracketIndent = (currentDepth === 1)
-      ? indent.repeat(depth - currentDepth)
-      : indent.repeat(depth - 1);
-
-    const lines = Object
-      .entries(currentValue)
-      .map(([key, val]) => `${currentIndent}${key}: ${iter(val, depth + 2)}`);
-
-    return [
-      '{',
-      ...lines,
-      `${bracketIndent}}`,
-    ].join('\n');
-  };
-
-  return iter(value, currentDepth + 2);
+const stylishObject = (obj, level = 0) => {
+  const numOfSpaces = (level + 1) * 2;
+  const allKeys = _.sortBy(Object.keys(obj), (el) => el);
+  const repr = allKeys.map((key) => {
+    if (isObject(obj[key])) {
+      return `${' '.repeat(numOfSpaces)}  ${key}: ${stylishObject(obj[key], level + 2)}`;
+    }
+    return `${' '.repeat(numOfSpaces)}  ${key}: ${obj[key]}`;
+  });
+  return `{\n${repr.join('\n')}\n${' '.repeat(numOfSpaces - 2)}}`;
 };
 
-const stylish = (tree, indent = '  ') => {
-  const iter = (node, depth) => {
-    const currentIndent = indent.repeat(depth);
+const stylishValue = (val, level = 0) => {
+  if (isObject(val)) {
+    return stylishObject(val, level);
+  }
+  return `${val}`;
+};
 
-    const result = node.map((obj) => {
-      const { key, value, status } = obj;
-      switch (status) {
-        case 'nested':
-          return `${currentIndent}  ${key}: {\n${iter(value, depth + 2)}\n${currentIndent}  }`;
+const stylish = (o1, o2) => {
+  const struct = genDiff(o1, o2);
+  const stylishTraversal = (node, level = 0) => {
+    const numOfSpaces = (level + 1) * 2;
+    const repr = node.map((el) => {
+      switch (el.type) {
         case 'removed':
-          return `${currentIndent}- ${key}: ${stringify(obj.value, depth, indent)}`;
+          return `${' '.repeat(numOfSpaces)}- ${el.key}: ${stylishValue(el.value, level + 2)}`; // + 2 for one level deeper and for "- "
         case 'added':
-          return `${currentIndent}+ ${key}: ${stringify(obj.value, depth, indent)}`;
-        case 'changed':
-          return `${currentIndent}- ${key}: ${stringify(obj.oldValue, depth, indent)}\n${currentIndent}+ ${key}: ${stringify(obj.newValue, depth, indent)}`;
+          return `${' '.repeat(numOfSpaces)}+ ${el.key}: ${stylishValue(el.value, level + 2)}`;
         case 'unchanged':
-          return `${currentIndent}  ${key}: ${stringify(obj.value, depth, indent)}`;
+          return `${' '.repeat(numOfSpaces)}  ${el.key}: ${stylishValue(el.value, level + 2)}`;
+        case 'changedLater':
+          return `${' '.repeat(numOfSpaces)}  ${el.key}: ${stylishTraversal(el.value, level + 2)}`;
+        case 'updated':
+          return `${' '.repeat(numOfSpaces)}- ${el.key}: ${stylishValue(el.before, level + 2)}`
+          + '\n'
+          + `${' '.repeat(numOfSpaces)}+ ${el.key}: ${stylishValue(el.current, level + 2)}`;
         default:
-          throw new Error(`Status "${status}" is unknown`);
+          throw new Error('unknown type');
       }
     });
-
-    return result.join('\n');
+    return `{\n${repr.join('\n')}\n${' '.repeat(numOfSpaces - 2)}}`;
   };
 
-  return `{\n${iter(tree, 1)}\n}`;
+  return stylishTraversal(struct);
 };
 
 export default stylish;
