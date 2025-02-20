@@ -1,44 +1,52 @@
-import genDiff from '../gendiff.js';
+import _ from 'lodash';
 
-function isObject(value) {
-  return (
-    typeof value === 'object'
-    && value !== null
-    && !Array.isArray(value)
-  );
-}
+const getPrintedValue = (value) => {
+  if (!_.isPlainObject(value)) {
+    return typeof value !== 'string' ? `${value}` : `'${value}'`;
+  }
 
-const plainValue = (val) => {
-  if (isObject(val)) {
-    return '[complex value]';
-  }
-  if (typeof val === 'string') {
-    return `'${val}'`;
-  }
-  return `${val}`;
+  return '[complex value]';
 };
 
-const plain = (o1, o2) => {
-  const struct = genDiff(o1, o2);
-  const plainTraversal = (node, path = []) => {
-    const repr = node.filter((el) => el.type !== 'unchanged')
-      .map((el) => {
-        switch (el.type) {
-          case 'removed':
-            return `Property '${[...path, el.key].join('.')}' was removed`;
-          case 'added':
-            return `Property '${[...path, el.key].join('.')}' was added with value: ${plainValue(el.value)}`;
-          case 'changedLater':
-            return plainTraversal(el.value, [...path, el.key]);
-          case 'updated':
-            return `Property '${[...path, el.key].join('.')}' was updated. From ${plainValue(el.before)} to ${plainValue(el.current)}`;
-          default:
-            throw new Error(`unknown type ${el.type}`);
-        }
-      });
-    return repr.join('\n');
-  };
-  return plainTraversal(struct);
+const formatPlain = (data) => {
+  const result = data.map((item) => {
+    const {
+      operation,
+      key,
+    } = item;
+
+    switch (operation) {
+      case 'nested': {
+        const { children } = item;
+
+        return formatPlain(children.map((child) => _.defaults({ key: `${key}.${child.key}` }, child)));
+      }
+
+      case 'add': {
+        const { value } = item;
+
+        return `Property '${key}' was added with value: ${getPrintedValue(value)}`;
+      }
+
+      case 'remove': {
+        return `Property '${key}' was removed`;
+      }
+
+      case 'update': {
+        const {
+          value1,
+          value2,
+        } = item;
+
+        return `Property '${key}' was updated. From ${getPrintedValue(value1)} to ${getPrintedValue(value2)}`;
+      }
+
+      default:
+        return '';
+    }
+  });
+
+  return _.compact(result).join('\n');
 };
 
-export default plain;
+export default formatPlain;

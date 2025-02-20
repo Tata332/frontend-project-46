@@ -1,0 +1,116 @@
+[
+  {
+    "operation": "nested",
+    "key": "common",
+    "children": [
+      {
+        "operation": "add",
+        "key": "follow",
+        "value": false
+      },
+      {
+        "operation": "nochange",
+        "key": "setting1",
+        "value": "Value 1"
+      },
+      {
+        "operation": "remove",
+        "key": "setting2",
+        "value": 200
+      },
+      {
+        "operation": "update",
+        "key": "setting3",
+        "value1": true,
+        "value2": null
+      },
+      {
+        "operation": "add",
+        "key": "setting4",
+        "value": "blah blah"
+      },
+      {
+        "operation": "add",
+        "key": "setting5",
+        "value": {
+          "key5": "value5"
+        }
+      },
+      {
+        "operation": "nested",
+        "key": "setting6",
+        "children": [
+          {
+            "operation": "nested",
+            "key": "doge",
+            "children": [
+              {
+                "operation": "update",
+                "key": "wow",
+                "value1": "",
+                "value2": "so much"
+              }
+            ]
+          },
+          {
+            "operation": "nochange",
+            "key": "key",
+            "value": "value"
+          },
+          {
+            "operation": "add",
+            "key": "ops",
+            "value": "vops"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "operation": "nested",
+    "key": "group1",
+    "children": [
+      {
+        "operation": "update",
+        "key": "baz",
+        "value1": "bas",
+        "value2": "bars"
+      },
+      {
+        "operation": "nochange",
+        "key": "foo",
+        "value": "bar"
+      },
+      {
+        "operation": "update",
+        "key": "nest",
+        "value1": {
+          "key": "value"
+        },
+        "value2": "str"
+      }
+    ]
+  },
+  {
+    "operation": "remove",
+    "key": "group2",
+    "value": {
+      "abc": 12345,
+      "deep": {
+        "id": 45
+      }
+    }
+  },
+  {
+    "operation": "add",
+    "key": "group3",
+    "value": {
+      "deep": {
+        "id": {
+          "number": 45
+        }
+      },
+      "fee": 100500
+    }
+  }
+]
