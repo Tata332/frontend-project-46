@@ -1,29 +1,16 @@
-import fs from 'fs';
-import path from 'path';
 import yaml from 'js-yaml';
 
-const getFileType = (fileName) => {
-  if (fileName.endsWith('.yml') || fileName.endsWith('.yaml')) {
-    return 'yaml';
-  }
-  if (fileName.endsWith('.json')) {
-    return 'json';
-  }
-  return '';
-};
-
-const retriveObjectFromFile = (filepath) => {
-  const absolutePath = path.resolve(process.cwd(), filepath);
-  const type = getFileType(filepath);
-  const content = fs.readFileSync(absolutePath, 'utf8');
-  switch (type) {
+const parseFile = (file, fileExt) => {
+  switch (fileExt.toLowerCase()) {
     case 'json':
-      return JSON.parse(content);
-    case 'yaml':
-      return yaml.load(content);
+      return JSON.parse(file);
+
+    case 'yml' || 'yaml':
+      return yaml.load(file);
+
     default:
-      throw new Error('Unknown file type');
+      throw new Error(`Unknown format: ${fileExt}`);
   }
 };
 
-export default retriveObjectFromFile;
+export default parseFile;

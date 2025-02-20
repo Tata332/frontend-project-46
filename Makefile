@@ -1,18 +1,17 @@
-JEST := npx jest
-
-install:
+install: 
 	npm ci
 
 publish:
 	npm publish --dry-run
 
-test:
-	$(JEST) --runInBand
-
-coverage:
-	$(JEST) --coverage --runInBand
-
 lint:
 	npx eslint .
+	
+lint-fix:
+	npx eslint --fix .
 
-.PHONY: install publish test coverage lint
+test:
+	npx jest
+
+test-coverage:
+	npx jest --coverage
