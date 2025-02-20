@@ -1,20 +1,17 @@
-install: 
-	npm ci
-JEST=NODE_OPTIONS=--experimental-vm-modules npx jest
-
 install:
 	npm ci
+
+gendiff:
+	node bin/gendiff.js
 
 publish:
 	npm publish --dry-run
 
-test:
-	$(JEST)
-
-coverage:
-	$(JEST) --coverage
-
 lint:
 	npx eslint .
 
-.PHONY: install publish coverage lint
+test:
+	npx jest .
+
+report:
+	npx jest --coverage
