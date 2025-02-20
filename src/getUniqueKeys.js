@@ -1,64 +1,55 @@
 import _ from 'lodash';
 
-const firstObjectOnlyKeys = (o1, o2) => {
-  const keys = Object.keys(o1).filter((el) => !Object.keys(o2).includes(el));
-  return new Set(keys);
-};
+const findDiff = (data1, data2) => {
+  const keys1 = Object.keys(data1);
+  const keys2 = Object.keys(data2);
+  const keys = _.sortBy(_.union(keys1, keys2));
 
-function isObject(value) {
-  return (
-    typeof value === 'object'
-    && value !== null
-    && !Array.isArray(value)
-  );
-}
-
-const getUniqueKeys = (o1, o2) => {
-  const allKeys = _.sortBy([...new Set([...Object.keys(o1), ...Object.keys(o2)])], (el) => el);
-
-  const obj1OnlyKeys = firstObjectOnlyKeys(o1, o2);
-  const obj2OnlyKeys = firstObjectOnlyKeys(o2, o1);
-
-  const mutualKeys = Object.keys(o1).filter((el) => Object.keys(o2).includes(el));
-  const sameValueKeys = new Set(mutualKeys.filter((el) => o1[el] === o2[el]));
-
-  const diffOutputArr = allKeys.reduce((diff, key) => {
-    if (obj1OnlyKeys.has(key)) {
-      return [...diff, {
-        type: 'removed',
+  const result = keys.map((key) => {
+    if (!_.has(data1, key)) {
+      return {
+        operation: 'add',
         key,
-        value: o1[key],
-      }];
+        value: data2[key],
+      };
     }
-    if (obj2OnlyKeys.has(key)) {
-      return [...diff, {
-        type: 'added',
+
+    if (!_.has(data2, key)) {
+      return {
+        operation: 'remove',
         key,
-        value: o2[key],
-      }];
+        value: data1[key],
+      };
     }
-    if (sameValueKeys.has(key)) {
-      return [...diff, {
-        type: 'unchanged',
+
+    const value1 = data1[key];
+    const value2 = data2[key];
+
+    if (_.isPlainObject(value1) && _.isPlainObject(value2)) {
+      return {
+        operation: 'nested',
         key,
-        value: o1[key],
-      }];
+        children: findDiff(value1, value2),
+      };
     }
-    if (isObject(o1[key]) && isObject(o2[key])) {
-      return [...diff, {
-        type: 'changedLater',
+
+    if (!_.isEqual(value1, value2)) {
+      return {
+        operation: 'update',
         key,
-        value: getUniqueKeys(o1[key], o2[key]),
-      }];
+        value1,
+        value2,
+      };
     }
-    return [...diff, {
-      type: 'updated',
+
+    return {
+      operation: 'nochange',
       key,
-      before: o1[key],
-      current: o2[key],
-    }];
-  }, []);
-  return diffOutputArr;
+      value: value1,
+    };
+  });
+
+  return result;
 };
 
-export default getUniqueKeys;
+export default findDiff;
