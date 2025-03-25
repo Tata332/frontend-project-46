@@ -8,8 +8,8 @@ export default defineConfig([
     files: ["**/*.{js,mjs,cjs}"], 
     languageOptions: { 
       globals: { 
-        ...globals.browser, // Оставляем поддержку браузера
-        ...globals.node, // Добавляем поддержку Node.js
+        ...globals.browser,
+        ...globals.node,
       } 
     } 
   },
