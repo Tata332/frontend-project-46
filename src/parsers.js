@@ -1,13 +1,13 @@
-import { readFileSync } from 'fs';
-import path from 'path';
 import yaml from 'js-yaml';
 
-const getFileFormat = (filepath) => path.extname(filepath).slice(1);
-
-const parse = (filepath) => {
-  const content = readFileSync(filepath, 'utf8');
-  const format = getFileFormat(filepath);
-  return format === 'json' ? JSON.parse(content) : yaml.load(content);
+// Выбирается парсер в зависимости от расширения
+const parser = (extension) => {
+  if (extension === '.json') {
+    return JSON.parse;
+  } if (extension === '.yml' || extension === '.yaml') {
+    return yaml.safeLoad;
+  }
+  throw new Error(`${extension} extension is not supported. Acceptable extensions are json and yaml(yml)`);
 };
 
-export default parse;
+export default parser;
